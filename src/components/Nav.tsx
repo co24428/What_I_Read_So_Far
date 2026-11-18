@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useI18n, type DictKey } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import { Button } from "./ui";
@@ -28,6 +28,17 @@ export function Nav() {
   const { t, lang, setLang } = useI18n();
   const { openAdd } = useStore();
   const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  const activeIdx = LINKS.findIndex((l) => isActive(l.href));
+  // Tabs to the right slide in from the right, tabs to the left from the left (like iOS)
+  const dir = (i: number) => (i > activeIdx ? ["tab-forward"] : ["tab-back"]);
+
+  // Sliding highlight behind the active desktop link
+  const navRef = useRef<HTMLElement>(null);
+  const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
+  useLayoutEffect(() => {
+    const el = navRef.current?.querySelectorAll<HTMLElement>("a")[activeIdx];
+    setPill(el ? { left: el.offsetLeft, width: el.offsetWidth } : null);
+  }, [activeIdx, lang]);
 
   const logout = async () => {
     await fetch("/api/logout", { method: "POST" });
@@ -36,13 +47,20 @@ export function Nav() {
 
   return (
     <>
-      <header className="pt-safe sticky top-0 z-40 border-b border-stone-200 bg-white/90 backdrop-blur">
+      <header className="pt-safe sticky top-0 z-40 border-b border-stone-200/70 bg-white/80 backdrop-blur-xl" style={{ viewTransitionName: "site-header" }}>
         <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-2">
-          <Link href="/" className="mr-3 truncate font-bold tracking-tight">📚 {t("appName")}</Link>
-          <nav className="hidden gap-1 md:flex">
-            {LINKS.map((l) => (
-              <Link key={l.href} href={l.href}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium ${isActive(l.href) ? "bg-stone-800 text-white" : "text-stone-600 hover:bg-stone-100"}`}>
+          <Link href="/" transitionTypes={dir(0)} className="group mr-3 flex items-center gap-1.5 truncate font-bold tracking-tight">
+            <span className="inline-block transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110">📚</span>
+            {t("appName")}
+          </Link>
+          <nav ref={navRef} className="relative hidden gap-1 md:flex">
+            {pill && (
+              <span className="absolute inset-y-0 rounded-xl bg-stone-900 shadow-sm transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{ left: pill.left, width: pill.width }} />
+            )}
+            {LINKS.map((l, i) => (
+              <Link key={l.href} href={l.href} transitionTypes={dir(i)}
+                className={`relative z-10 rounded-xl px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${isActive(l.href) ? "text-white" : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"}`}>
                 {t(l.key)}
               </Link>
             ))}
@@ -58,27 +76,30 @@ export function Nav() {
       </header>
 
       {/* Phone: bottom tab bar with a centre "add" button */}
-      <nav className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 backdrop-blur md:hidden">
+      <nav className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-stone-200/70 bg-white/85 backdrop-blur-xl md:hidden" style={{ viewTransitionName: "tab-bar" }}>
         <div className="grid grid-cols-5 items-end">
-          {LINKS.slice(0, 2).map((l) => <Tab key={l.href} href={l.href} label={t(l.key)} active={isActive(l.href)} />)}
+          {LINKS.slice(0, 2).map((l, i) => <Tab key={l.href} href={l.href} label={t(l.key)} active={isActive(l.href)} types={dir(i)} />)}
           <div className="flex justify-center pb-1.5">
             <button onClick={() => openAdd()} aria-label={t("addBook")}
-              className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-stone-800 text-3xl font-light text-white shadow-lg active:scale-95">
+              className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-stone-900 text-3xl font-light text-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.5)] ring-4 ring-white transition-transform duration-200 active:scale-90">
               ＋
             </button>
           </div>
-          {LINKS.slice(2).map((l) => <Tab key={l.href} href={l.href} label={t(l.key)} active={isActive(l.href)} />)}
+          {LINKS.slice(2).map((l, i) => <Tab key={l.href} href={l.href} label={t(l.key)} active={isActive(l.href)} types={dir(i + 2)} />)}
         </div>
       </nav>
     </>
   );
 }
 
-function Tab({ href, label, active }: { href: string; label: string; active: boolean }) {
+function Tab({ href, label, active, types }: { href: string; label: string; active: boolean; types: string[] }) {
   return (
-    <Link href={href} className={`flex flex-col items-center gap-0.5 pb-1.5 pt-2 text-[11px] font-medium ${active ? "text-stone-900" : "text-stone-400"}`}>
-      {ICONS[href]}
+    <Link href={href} transitionTypes={types}
+      className={`relative flex flex-col items-center gap-0.5 pb-1.5 pt-2 text-[11px] font-medium transition-colors duration-200 active:scale-95 ${active ? "text-stone-900" : "text-stone-400"}`}>
+      {/* key forces the pop animation each time the tab becomes active */}
+      <span key={String(active)} className={active ? "animate-pop" : ""}>{ICONS[href]}</span>
       {label}
+      <span className={`absolute top-0 h-0.5 rounded-full bg-stone-900 transition-all duration-300 ${active ? "w-6 opacity-100" : "w-0 opacity-0"}`} />
     </Link>
   );
 }

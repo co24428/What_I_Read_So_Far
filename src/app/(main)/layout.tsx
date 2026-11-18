@@ -2,6 +2,7 @@ import { StoreProvider } from "@/lib/store";
 import { Nav } from "@/components/Nav";
 import { BookDetailModal } from "@/components/BookDetailModal";
 import { AddBookDialog } from "@/components/AddBookDialog";
+import { Toaster } from "@/components/Toaster";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <main className="mx-auto max-w-7xl px-3 pb-28 pt-4 sm:px-4 md:py-6">{children}</main>
       <BookDetailModal />
       <AddBookDialog />
+      <Toaster />
     </StoreProvider>
   );
 }

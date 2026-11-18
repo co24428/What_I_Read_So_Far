@@ -5,6 +5,7 @@ import { api } from "@/lib/client";
 import { useI18n } from "@/lib/i18n";
 import { Button, inputCls } from "@/components/ui";
 import { TreeEditor } from "@/components/tree/TreeEditor";
+import { PageTransition } from "@/components/PageTransition";
 
 const COLORS = ["#6366f1", "#db2777", "#0ea5e9", "#10b981", "#f59e0b", "#78716c"];
 
@@ -58,6 +59,7 @@ export default function TreePage() {
   };
 
   return (
+    <PageTransition>
     <div className="flex h-[calc(100dvh_-_11.5rem_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] flex-col gap-2 md:h-[calc(100vh_-_7rem)] md:flex-row md:gap-3">
       {/* Phone: compact tree picker */}
       <div className="flex shrink-0 items-center gap-1.5 md:hidden">
@@ -92,11 +94,11 @@ export default function TreePage() {
         </div>
       )}
 
-      <aside className="hidden w-56 shrink-0 flex-col rounded-2xl bg-white p-3 shadow-sm md:flex">
+      <aside className="hidden w-56 shrink-0 flex-col rounded-2xl bg-white p-3 shadow-sm ring-1 ring-stone-900/5 md:flex">
         <h3 className="mb-2 text-sm font-semibold">{t("trees")}</h3>
         <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto">
           {trees.map((tr, i) => (
-            <li key={tr.id} className={`group rounded-lg ${selected === tr.id ? "bg-stone-100" : "hover:bg-stone-50"}`}>
+            <li key={tr.id} className={`group rounded-xl transition-all duration-150 ${selected === tr.id ? "bg-stone-100 shadow-sm" : "hover:translate-x-0.5 hover:bg-stone-50"}`}>
               {editing === tr.id ? (
                 <form className="space-y-1.5 p-1.5" onSubmit={(e) => { e.preventDefault(); void patch(tr.id, { nickname: editName }); setEditing(null); }}>
                   <input autoFocus className={inputCls} value={editName} onChange={(e) => setEditName(e.target.value)} />
@@ -115,7 +117,7 @@ export default function TreePage() {
                 <div className="flex items-center">
                   <button onClick={() => setSelected(tr.id)} onDoubleClick={() => { setEditing(tr.id); setEditName(tr.nickname); }}
                     className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left text-sm">
-                    <span className="h-3 w-3 shrink-0 rounded" style={{ background: tr.color }} />
+                    <span className={`h-3 w-3 shrink-0 rounded transition-transform duration-200 ${selected === tr.id ? "scale-125" : "group-hover:scale-110"}`} style={{ background: tr.color }} />
                     <span className="truncate">{tr.nickname}</span>
                   </button>
                   <div className="hidden shrink-0 text-xs text-stone-400 group-hover:flex">
@@ -140,5 +142,6 @@ export default function TreePage() {
         <div className="flex flex-1 items-center justify-center rounded-2xl bg-white text-sm text-stone-400 shadow-sm">{t("selectTree")}</div>
       )}
     </div>
+    </PageTransition>
   );
 }

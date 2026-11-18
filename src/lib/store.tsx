@@ -18,7 +18,12 @@ interface Store {
   openAdd: (opts?: { status?: Book["status"]; onAdded?: (b: Book) => void }) => void;
   addOpts: { status?: Book["status"]; onAdded?: (b: Book) => void } | null;
   closeAdd: () => void;
+  /** Show a short confirmation message */
+  toast: (message: string, tone?: Toast["tone"]) => void;
+  toasts: Toast[];
 }
+
+export interface Toast { id: number; message: string; tone: "success" | "error" | "info" }
 
 const Ctx = createContext<Store | null>(null);
 
@@ -28,6 +33,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [openBookId, setOpenBookId] = useState<string | null>(null);
   const [addOpts, setAddOpts] = useState<Store["addOpts"]>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const toast = useCallback((message: string, tone: Toast["tone"] = "success") => {
+    const id = Date.now() + Math.random();
+    setToasts((ts) => [...ts.slice(-2), { id, message, tone }]);
+    setTimeout(() => setToasts((ts) => ts.filter((x) => x.id !== id)), 2600);
+  }, []);
 
   const reload = useCallback(async () => {
     try {
@@ -56,6 +67,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         books, loading, error, reload, upsertLocal, removeLocal,
         openBook: setOpenBookId, openBookId, closeBook: () => setOpenBookId(null),
         openAdd: (opts) => setAddOpts(opts ?? {}), addOpts, closeAdd: () => setAddOpts(null),
+        toast, toasts,
       }}
     >
       {children}

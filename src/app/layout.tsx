@@ -19,6 +19,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
+      <head>
+        {/* Pretendard — the standard Korean UI typeface (loaded by the browser from a CDN) */}
+        <link
+          rel="stylesheet"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
       <body className="min-h-dvh bg-stone-50 text-stone-900 antialiased">
         <I18nProvider>{children}</I18nProvider>
       </body>

@@ -1,19 +1,99 @@
 @import "tailwindcss";
 
-body {
-  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
-  -webkit-tap-highlight-color: transparent;
+@theme {
+  --font-sans: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-in: fade-in 220ms var(--ease-out-soft) both;
+  --animate-rise: rise 380ms var(--ease-out-soft) both;
+  --animate-pop: pop 320ms var(--ease-spring) both;
+  --animate-sheet-up: sheet-up 340ms var(--ease-out-soft) both;
+  --animate-dialog-in: dialog-in 240ms var(--ease-out-soft) both;
+  --animate-shake: shake 380ms ease-in-out both;
+  --animate-slide-left: slide-left 300ms var(--ease-out-soft) both;
+  --animate-slide-right: slide-right 300ms var(--ease-out-soft) both;
+
+  @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+  @keyframes pop { 0% { transform: scale(0.6); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
+  @keyframes sheet-up { from { transform: translateY(100%) } to { transform: none } }
+  @keyframes dialog-in { from { opacity: 0; transform: translateY(12px) scale(0.97) } to { opacity: 1; transform: none } }
+  @keyframes shake { 0%,100% { transform: none } 20%,60% { transform: translateX(-6px) } 40%,80% { transform: translateX(6px) } }
+  @keyframes slide-left { from { opacity: 0; transform: translateX(24px) } to { opacity: 1; transform: none } }
+  @keyframes slide-right { from { opacity: 0; transform: translateX(-24px) } to { opacity: 1; transform: none } }
 }
+
+body {
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  font-feature-settings: "tnum" 0;
+  letter-spacing: -0.01em;
+}
+
+/* Keyboard focus ring everywhere, never on mouse click */
+:focus-visible {
+  outline: 2px solid #a8a29e;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Staggered entrance for lists: put .stagger on the parent */
+.stagger > * { animation: rise 420ms var(--ease-out-soft) both; }
+.stagger > *:nth-child(1) { animation-delay: 0ms }
+.stagger > *:nth-child(2) { animation-delay: 40ms }
+.stagger > *:nth-child(3) { animation-delay: 80ms }
+.stagger > *:nth-child(4) { animation-delay: 120ms }
+.stagger > *:nth-child(5) { animation-delay: 160ms }
+.stagger > *:nth-child(6) { animation-delay: 200ms }
+.stagger > *:nth-child(7) { animation-delay: 240ms }
+.stagger > *:nth-child(n+8) { animation-delay: 280ms }
+
+/* Loading skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg, #f5f5f4 0%, #e7e5e4 40%, #f5f5f4 80%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s linear infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { from { background-position: 200% 0 } to { background-position: -200% 0 } }
 
 /* iOS Safari zooms into inputs smaller than 16px — keep them 16px on phones */
 @media (max-width: 767px) {
   input, select, textarea { font-size: 16px !important; }
 }
 
-/* Bigger connection dots on touch screens */
+/* ---------- React Flow polish ---------- */
 @media (pointer: coarse) {
   .react-flow__handle { width: 18px !important; height: 18px !important; }
 }
+.react-flow__handle { transition: transform 150ms var(--ease-spring); }
+.react-flow__handle:hover { transform: translate(-50%, 50%) scale(1.5); }
+.react-flow__handle-top:hover { transform: translate(-50%, -50%) scale(1.5); }
+.react-flow__edge-path { transition: stroke-width 150ms; }
+.react-flow__edge:hover .react-flow__edge-path { stroke-width: 3.5 !important; }
+.react-flow__edge.selected .react-flow__edge-path { stroke-width: 4 !important; }
 
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 .pt-safe { padding-top: env(safe-area-inset-top); }
+
+/* ---------- Page transitions (React <ViewTransition>) ---------- */
+::view-transition { pointer-events: none; }
+
+::view-transition-old(.tab-forward) { --slide: -40px; animation: 140ms ease-in both vt-fade reverse, 320ms var(--ease-out-soft) both vt-slide reverse; }
+::view-transition-new(.tab-forward) { --slide: 40px;  animation: 220ms ease-out 100ms both vt-fade, 320ms var(--ease-out-soft) both vt-slide; }
+::view-transition-old(.tab-back)    { --slide: 40px;  animation: 140ms ease-in both vt-fade reverse, 320ms var(--ease-out-soft) both vt-slide reverse; }
+::view-transition-new(.tab-back)    { --slide: -40px; animation: 220ms ease-out 100ms both vt-fade, 320ms var(--ease-out-soft) both vt-slide; }
+@keyframes vt-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes vt-slide { from { translate: var(--slide) } to { translate: 0 } }
+
+/* Header and tab bar stay still while pages slide */
+::view-transition-group(site-header), ::view-transition-group(tab-bar) { animation: none; z-index: 100; }
+::view-transition-old(site-header), ::view-transition-old(tab-bar) { display: none; }
+::view-transition-new(site-header), ::view-transition-new(tab-bar) { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) { animation-duration: 0s !important; animation-delay: 0s !important; }
+}
+@keyframes grow { from { transform: scaleX(0) } to { transform: scaleX(1) } }

@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [pw, setPw] = useState("");
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [shake, setShake] = useState(0);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,18 +25,20 @@ export default function LoginPage() {
     } else {
       setError(true);
       setBusy(false);
+      setShake((n) => n + 1);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <form onSubmit={submit} className="w-full max-w-xs space-y-4 rounded-2xl bg-white p-6 shadow-sm">
+    <div className="flex min-h-dvh items-center justify-center bg-[radial-gradient(ellipse_at_top,_#e7e5e4,_#fafaf9_60%)] p-4">
+      <form key={shake} onSubmit={submit}
+        className={`w-full max-w-xs space-y-4 rounded-3xl bg-white/90 p-7 shadow-xl ring-1 ring-stone-900/5 backdrop-blur ${shake ? "animate-shake" : "animate-dialog-in"}`}>
         <div className="text-center">
-          <div className="text-4xl">📚</div>
+          <div className="animate-pop inline-block text-5xl [animation-delay:150ms]">📚</div>
           <h1 className="mt-2 text-lg font-bold">{t("appName")}</h1>
         </div>
         <input type="password" autoFocus className={inputCls} placeholder={t("password")} value={pw} onChange={(e) => setPw(e.target.value)} />
-        {error && <p className="text-sm text-red-600">{t("wrongPassword")}</p>}
+        {error && <p className="animate-fade-in text-sm text-red-600">{t("wrongPassword")}</p>}
         <Button type="submit" disabled={busy || !pw} className="w-full">{t("enter")}</Button>
         <button type="button" className="w-full text-xs text-stone-400" onClick={() => setLang(lang === "ko" ? "en" : "ko")}>
           {lang === "ko" ? "English" : "한국어"}

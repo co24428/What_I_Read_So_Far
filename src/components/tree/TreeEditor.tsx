@@ -182,7 +182,10 @@ function Editor({ treeId }: { treeId: string }) {
 
         <div className="absolute left-3 top-3 flex items-center gap-2">
           <Button variant="outline" className="bg-white" onClick={doLayout}>⇅ {t("autoLayout")}</Button>
-          <span className="text-xs text-stone-400">{t(saveState)}</span>
+          <span className={`flex items-center gap-1 text-xs transition-colors ${saveState === "saved" ? "text-emerald-600" : "text-stone-400"}`}>
+            {saveState === "saving" ? <span className="h-3 w-3 animate-spin rounded-full border-2 border-stone-300 border-t-stone-600" /> : saveState === "saved" ? "✓" : "•"}
+            {t(saveState)}
+          </span>
         </div>
         <p className="pointer-events-none absolute left-3 top-14 max-w-[16rem] text-[11px] leading-snug text-stone-400">
           <span className="hidden md:inline">{t("treeHelp")}</span>
@@ -191,7 +194,7 @@ function Editor({ treeId }: { treeId: string }) {
         <div className="absolute bottom-3 right-3 md:hidden"><Button className="shadow-lg" onClick={() => setSheetOpen(true)}>📚 {t("addToTree")}</Button></div>
 
         {(selectedBook || selectedEdge) && (
-          <div className="absolute inset-x-3 bottom-3 z-10 space-y-3 rounded-xl border border-stone-200 bg-white p-3 shadow-lg md:inset-x-auto md:bottom-auto md:right-3 md:top-3 md:w-64">
+          <div key={selectedNode?.id ?? selectedEdge?.id} className="animate-rise absolute inset-x-3 bottom-3 z-10 space-y-3 rounded-2xl border border-stone-200 bg-white p-3 shadow-lg md:inset-x-auto md:bottom-auto md:right-3 md:top-3 md:w-64">
             {selectedBook && selectedNode && (
               <>
                 <p className="text-sm font-semibold">{selectedBook.title}</p>
@@ -230,9 +233,9 @@ function Editor({ treeId }: { treeId: string }) {
       </div>
 
       {/* Book list — desktop: right column; phone: bottom sheet */}
-      {sheetOpen && <div className="fixed inset-0 z-40 bg-black/30 md:hidden" onClick={() => setSheetOpen(false)} />}
+      {sheetOpen && <div className="animate-fade-in fixed inset-0 z-40 bg-black/30 md:hidden" onClick={() => setSheetOpen(false)} />}
       <aside className={`pb-safe flex-col bg-white p-3 md:static md:flex md:w-60 md:shrink-0 md:rounded-2xl md:shadow-sm ${
-        sheetOpen ? "fixed inset-x-0 bottom-0 z-50 flex max-h-[75dvh] rounded-t-2xl shadow-2xl" : "hidden"}`}>
+        sheetOpen ? "animate-sheet-up fixed inset-x-0 bottom-0 z-50 flex max-h-[75dvh] rounded-t-3xl shadow-2xl" : "hidden"}`}>
         <div className="mb-1 flex items-center justify-between">
           <h3 className="text-sm font-semibold">{t("myBooks")}</h3>
           <span className="md:hidden"><Button variant="ghost" onClick={() => setSheetOpen(false)}>{t("done")}</Button></span>
@@ -252,8 +255,8 @@ function Editor({ treeId }: { treeId: string }) {
                 onDragStart={(e) => { e.dataTransfer.setData("application/x-book-id", b.id); e.dataTransfer.effectAllowed = "move"; }}
                 onDoubleClick={() => !used && addBookNode(b.id)}
                 onClick={() => { if (!used && sheetOpen) addBookNode(b.id); }}
-                className={`flex items-center gap-2 rounded-lg p-1.5 ${used ? "opacity-40" : "cursor-grab hover:bg-stone-100 active:bg-stone-100"}`}>
-                <Cover src={b.cover_url} title="" className="h-10 w-7 shrink-0" />
+                className={`group flex items-center gap-2 rounded-xl p-1.5 transition-all duration-150 ${used ? "opacity-40" : "cursor-grab hover:-translate-x-0.5 hover:bg-stone-50 hover:shadow-sm active:scale-[0.98] active:cursor-grabbing"}`}>
+                <Cover src={b.cover_url} title={b.title} hideTitle className="h-10 w-7 shrink-0" />
                 <div className="min-w-0">
                   <p className="truncate text-xs font-medium">{b.title}</p>
                   <p className="flex items-center gap-1 text-[10px] text-stone-500">
