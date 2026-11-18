@@ -70,7 +70,7 @@ function AddBookInner() {
     };
 
     return (
-      <div className="p-5">
+      <div className="p-4 sm:p-5">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold">{t("addBook")}</h2>
           <Button variant="ghost" onClick={closeAdd}>✕</Button>
@@ -84,14 +84,14 @@ function AddBookInner() {
           </>
         ) : (
           <>
-            <form onSubmit={search} className="flex gap-2">
-              <input autoFocus className={inputCls} placeholder={t("searchPlaceholder")} value={q} onChange={(e) => setQ(e.target.value)} />
+            <form onSubmit={search} className="flex flex-wrap gap-2 sm:flex-nowrap">
+              <input autoFocus className={`${inputCls} min-w-0 flex-1 basis-full sm:basis-auto`} placeholder={t("searchPlaceholder")} value={q} onChange={(e) => setQ(e.target.value)} />
               <Button type="submit" disabled={searching}>{t("search")}</Button>
               <Button variant="outline" onClick={() => setDraft({ title: "", status: defaultStatus, source: "manual" })}>
                 {t("manualEntry")}
               </Button>
             </form>
-            <div className="mt-4 max-h-[60vh] space-y-1 overflow-y-auto">
+            <div className="mt-4 space-y-1 sm:max-h-[60vh] sm:overflow-y-auto">
               {searching && <p className="py-6 text-center text-sm text-stone-500">{t("loading")}</p>}
               {busy && <p className="py-2 text-center text-sm text-stone-500">{t("loading")}</p>}
               {results?.length === 0 && <p className="py-6 text-center text-sm text-stone-500">{t("noResults")}</p>}

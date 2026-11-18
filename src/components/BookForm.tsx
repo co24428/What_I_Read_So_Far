@@ -46,7 +46,7 @@ export function BookForm({
           </Field>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label={`${t("authors")} (${t("commaHint")})`}>
           <input className={inputCls} value={f.authorsText} onChange={(e) => set("authorsText", e.target.value)} />
         </Field>
@@ -90,7 +90,7 @@ export function BookForm({
       <Field label={t("description")}>
         <textarea rows={3} className={inputCls} value={f.description ?? ""} onChange={(e) => set("description", e.target.value)} />
       </Field>
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="sticky bottom-0 -mx-4 flex justify-end gap-2 border-t border-stone-100 bg-white px-4 py-3 sm:static sm:mx-0 sm:border-0 sm:px-0 sm:pb-0">
         <Button variant="ghost" onClick={onCancel}>{t("cancel")}</Button>
         <Button type="submit" disabled={busy}>{t("save")}</Button>
       </div>

@@ -55,6 +55,7 @@ function Editor({ treeId }: { treeId: string }) {
   const [version, setVersion] = useState(0); // bump = unsaved change
   const [saveState, setSaveState] = useState<"saved" | "saving" | "unsaved">("saved");
   const [filter, setFilter] = useState("");
+  const [sheetOpen, setSheetOpen] = useState(false); // phone: book list as bottom sheet
   const wrapper = useRef<HTMLDivElement>(null);
   const dirty = useCallback(() => setVersion((v) => v + 1), []);
 
@@ -162,7 +163,7 @@ function Editor({ treeId }: { treeId: string }) {
 
   return (
     <div className="flex min-h-0 flex-1 gap-3">
-      <div className="relative min-w-0 flex-1 overflow-hidden rounded-2xl bg-white shadow-sm" ref={wrapper}
+      <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden rounded-2xl bg-white shadow-sm" ref={wrapper}
         onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }} onDrop={onDrop}>
         <ReactFlow
           nodes={nodes} edges={styledEdges} nodeTypes={nodeTypes}
@@ -172,8 +173,8 @@ function Editor({ treeId }: { treeId: string }) {
           minZoom={0.2} maxZoom={2} proOptions={{ hideAttribution: true }}
         >
           <Background gap={20} color="#e7e5e4" />
-          <Controls showInteractive={false} />
-          <MiniMap pannable zoomable nodeColor={(n) => {
+          <Controls showInteractive={false} className="!hidden md:!flex" />
+          <MiniMap className="!hidden md:!block" pannable zoomable nodeColor={(n) => {
             const b = books.find((x) => x.id === (n as BookFlowNode).data.bookId);
             return b ? STATUS_COLORS[b.status].hex : "#d6d3d1";
           }} />
@@ -183,12 +184,14 @@ function Editor({ treeId }: { treeId: string }) {
           <Button variant="outline" className="bg-white" onClick={doLayout}>⇅ {t("autoLayout")}</Button>
           <span className="text-xs text-stone-400">{t(saveState)}</span>
         </div>
-        <p className="pointer-events-none absolute left-3 top-14 hidden max-w-xs text-[11px] leading-snug text-stone-400 md:block">
-          {t("treeHelp")}
+        <p className="pointer-events-none absolute left-3 top-14 max-w-[16rem] text-[11px] leading-snug text-stone-400">
+          <span className="hidden md:inline">{t("treeHelp")}</span>
+          <span className="md:hidden">{t("treeHelpTouch")}</span>
         </p>
+        <div className="absolute bottom-3 right-3 md:hidden"><Button className="shadow-lg" onClick={() => setSheetOpen(true)}>📚 {t("addToTree")}</Button></div>
 
         {(selectedBook || selectedEdge) && (
-          <div className="absolute right-3 top-3 w-64 space-y-3 rounded-xl border border-stone-200 bg-white p-3 shadow-lg">
+          <div className="absolute inset-x-3 bottom-3 z-10 space-y-3 rounded-xl border border-stone-200 bg-white p-3 shadow-lg md:inset-x-auto md:bottom-auto md:right-3 md:top-3 md:w-64">
             {selectedBook && selectedNode && (
               <>
                 <p className="text-sm font-semibold">{selectedBook.title}</p>
@@ -226,12 +229,19 @@ function Editor({ treeId }: { treeId: string }) {
         )}
       </div>
 
-      {/* Book list */}
-      <aside className="flex w-60 shrink-0 flex-col rounded-2xl bg-white p-3 shadow-sm">
-        <h3 className="mb-1 text-sm font-semibold">{t("myBooks")}</h3>
-        <p className="mb-2 text-[11px] text-stone-400">{t("dragHint")}</p>
+      {/* Book list — desktop: right column; phone: bottom sheet */}
+      {sheetOpen && <div className="fixed inset-0 z-40 bg-black/30 md:hidden" onClick={() => setSheetOpen(false)} />}
+      <aside className={`pb-safe flex-col bg-white p-3 md:static md:flex md:w-60 md:shrink-0 md:rounded-2xl md:shadow-sm ${
+        sheetOpen ? "fixed inset-x-0 bottom-0 z-50 flex max-h-[75dvh] rounded-t-2xl shadow-2xl" : "hidden"}`}>
+        <div className="mb-1 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">{t("myBooks")}</h3>
+          <span className="md:hidden"><Button variant="ghost" onClick={() => setSheetOpen(false)}>{t("done")}</Button></span>
+        </div>
+        <p className="mb-2 text-[11px] text-stone-400">
+          <span className="hidden md:inline">{t("dragHint")}</span><span className="md:hidden">{t("tapToAdd")}</span>
+        </p>
         <input className={`${inputCls} mb-2`} placeholder={t("search")} value={filter} onChange={(e) => setFilter(e.target.value)} />
-        <Button variant="outline" className="mb-2" onClick={() => openAdd({ status: "want", onAdded: (b) => addBookNode(b.id) })}>
+        <Button variant="outline" className="mb-2" onClick={() => { setSheetOpen(false); openAdd({ status: "want", onAdded: (b) => addBookNode(b.id) }); }}>
           ＋ {t("addNewToTree")}
         </Button>
         <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto">
@@ -241,7 +251,8 @@ function Editor({ treeId }: { treeId: string }) {
               <li key={b.id} draggable={!used}
                 onDragStart={(e) => { e.dataTransfer.setData("application/x-book-id", b.id); e.dataTransfer.effectAllowed = "move"; }}
                 onDoubleClick={() => !used && addBookNode(b.id)}
-                className={`flex items-center gap-2 rounded-lg p-1.5 ${used ? "opacity-40" : "cursor-grab hover:bg-stone-100"}`}>
+                onClick={() => { if (!used && sheetOpen) addBookNode(b.id); }}
+                className={`flex items-center gap-2 rounded-lg p-1.5 ${used ? "opacity-40" : "cursor-grab hover:bg-stone-100 active:bg-stone-100"}`}>
                 <Cover src={b.cover_url} title="" className="h-10 w-7 shrink-0" />
                 <div className="min-w-0">
                   <p className="truncate text-xs font-medium">{b.title}</p>

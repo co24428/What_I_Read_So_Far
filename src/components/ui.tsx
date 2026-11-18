@@ -8,13 +8,19 @@ export function Modal({ open, onClose, children, wide }: { open: boolean; onClos
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden"; // don't scroll the page behind the sheet
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:p-10" onMouseDown={onClose}>
+    <div className="fixed inset-0 z-50 flex justify-center bg-black/40 sm:items-start sm:overflow-y-auto sm:p-10" onMouseDown={onClose}>
+      {/* Phone: full-screen sheet that scrolls on its own. Desktop: centred dialog. */}
       <div
-        className={`w-full ${wide ? "max-w-3xl" : "max-w-lg"} rounded-2xl bg-white shadow-xl`}
+        className={`pt-safe pb-safe h-dvh w-full overflow-y-auto overscroll-contain bg-white sm:h-auto sm:overflow-visible sm:rounded-2xl sm:shadow-xl ${wide ? "sm:max-w-3xl" : "sm:max-w-lg"}`}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {children}

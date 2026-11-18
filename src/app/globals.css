@@ -2,4 +2,18 @@
 
 body {
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
+
+/* iOS Safari zooms into inputs smaller than 16px — keep them 16px on phones */
+@media (max-width: 767px) {
+  input, select, textarea { font-size: 16px !important; }
+}
+
+/* Bigger connection dots on touch screens */
+@media (pointer: coarse) {
+  .react-flow__handle { width: 18px !important; height: 18px !important; }
+}
+
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pt-safe { padding-top: env(safe-area-inset-top); }

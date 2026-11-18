@@ -108,6 +108,13 @@ const dict = {
     ko: "노드 아래 점에서 다른 노드로 끌어 연결 · 연결선 클릭으로 종류 변경 · Delete 키로 삭제",
     en: "Drag from a node's bottom dot to another node to connect · Click an edge to change it · Delete key removes",
   },
+  treeHelpTouch: {
+    ko: "책 아래 점을 탭하고 다른 책 위 점을 탭하면 연결 · 길게 끌어 이동",
+    en: "Tap a book's bottom dot, then another's top dot to connect · Drag to move",
+  },
+  addToTree: { ko: "트리에 책 넣기", en: "Add books" },
+  tapToAdd: { ko: "탭해서 트리에 추가", en: "Tap to add to the tree" },
+  done: { ko: "완료", en: "Done" },
   addNewToTree: { ko: "새 책 검색해서 추가", en: "Search & add a new book" },
   moveUp: { ko: "위로", en: "Up" },
   moveDown: { ko: "아래로", en: "Down" },

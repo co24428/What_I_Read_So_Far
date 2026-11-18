@@ -64,3 +64,17 @@ Keys never go in git. `.env*` is git-ignored (except `.env.example`).
 | ![Calendar](docs/screenshots/home.png) | ![Book detail](docs/screenshots/detail.png) |
 | ![Library](docs/screenshots/library.png) | ![Stats](docs/screenshots/stats.png) |
 | ![Book tree](docs/screenshots/tree.png) | ![Login](docs/screenshots/login.png) |
+
+### iPhone
+
+Phones get a bottom tab bar with a centre ＋ (add book) button, full-screen sheets for book detail and
+add/edit, and a touch version of the Book Tree: pick a tree from the dropdown, tap **📚 트리에 책 넣기** to
+add books from a bottom sheet, tap a book's bottom dot then another book's top dot to connect them.
+
+**Use it like an app:** open the site in Safari → Share → **Add to Home Screen**. It opens full screen
+with its own icon.
+
+| | | |
+|---|---|---|
+| ![Calendar](docs/screenshots/mobile/home.png) | ![Detail](docs/screenshots/mobile/detail2.png) | ![Library](docs/screenshots/mobile/library.png) |
+| ![Tree](docs/screenshots/mobile/tree.png) | ![Tree books](docs/screenshots/mobile/tree_sheet.png) | ![Add book](docs/screenshots/mobile/add_form.png) |

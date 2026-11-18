@@ -65,7 +65,7 @@ function Detail({ id }: { id: string }) {
 
   if (editing)
     return (
-      <div className="p-5">
+      <div className="p-4 sm:p-5">
         <h2 className="mb-4 text-lg font-semibold">{t("edit")}</h2>
         <BookForm initial={book} onSubmit={patch} onCancel={() => setEditing(false)} />
       </div>
@@ -74,18 +74,18 @@ function Detail({ id }: { id: string }) {
   const pct = percent(book.current_page, book.total_pages);
 
   return (
-    <div className="p-5">
-      <div className="flex justify-end gap-1">
+    <div className="p-4 sm:p-5">
+      <div className="sticky top-0 z-10 -mx-4 -mt-4 mb-2 flex justify-end gap-1 bg-white/95 px-4 py-2 backdrop-blur sm:static sm:m-0 sm:p-0">
         <Button variant="ghost" onClick={() => setEditing(true)}>{t("edit")}</Button>
         <Button variant="danger" onClick={remove}>{t("delete")}</Button>
         <Button variant="ghost" onClick={closeBook}>✕</Button>
       </div>
 
       <div className="flex flex-col gap-5 sm:flex-row">
-        <Cover src={book.cover_url} title={book.title} className="h-56 w-40 shrink-0 self-center sm:self-start" />
+        <Cover src={book.cover_url} title={book.title} className="h-48 w-32 shrink-0 self-center sm:h-56 sm:w-40 sm:self-start" />
         <div className="min-w-0 flex-1 space-y-2">
           <StatusBadge status={book.status} />
-          <h2 className="text-2xl font-bold leading-tight">{book.title}</h2>
+          <h2 className="text-xl font-bold leading-tight sm:text-2xl">{book.title}</h2>
           {book.subtitle && <p className="text-stone-500">{book.subtitle}</p>}
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 pt-2 text-sm">
             <Row label={t("authors")} value={book.authors.join(", ")} />
@@ -158,8 +158,8 @@ function ProgressSection({
       <ProgressBar value={pct} color={STATUS_COLORS[book.status].hex} />
       <form onSubmit={submit} className="mt-3 flex flex-wrap items-center gap-2">
         <input type="number" min={0} max={book.total_pages ?? undefined} placeholder={t("nowOnPage")}
-          className={`${inputCls} !w-32`} value={page} onChange={(e) => setPage(e.target.value)} />
-        <input type="date" className={`${inputCls} !w-40`} value={date} onChange={(e) => setDate(e.target.value)} />
+          className={`${inputCls} !w-28`} value={page} onChange={(e) => setPage(e.target.value)} />
+        <input type="date" className={`${inputCls} !w-auto min-w-0 flex-1 sm:!w-40 sm:flex-none`} value={date} onChange={(e) => setDate(e.target.value)} />
         <Button type="submit">{t("record")}</Button>
         {logs.length > 0 && (
           <Button variant="ghost" onClick={() => setShowHistory((v) => !v)}>

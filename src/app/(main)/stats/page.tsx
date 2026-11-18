@@ -18,7 +18,7 @@ interface Stats {
 }
 
 const BAR = "#4f46e5"; // single-series hue
-const AXIS = { fontSize: 11, fill: "#78716c" };
+const AXIS = { fontSize: 10, fill: "#78716c" };
 
 export default function StatsPage() {
   const { t, lang } = useI18n();
@@ -33,7 +33,8 @@ export default function StatsPage() {
   if (error) return <p className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</p>;
   if (!data) return <p className="py-10 text-center text-sm text-stone-400">{t("loading")}</p>;
 
-  const monthName = (m: number) => (lang === "ko" ? `${m}월` : new Date(2000, m - 1, 1).toLocaleString("en-US", { month: "short" }));
+  // Short labels so all 12 months fit on a phone
+  const monthName = (m: number) => (lang === "ko" ? `${m}월` : new Date(2000, m - 1, 1).toLocaleString("en-US", { month: "narrow" }));
   const monthly = data.monthly.map((m) => ({ ...m, label: monthName(m.month) }));
   const num = (n: number) => n.toLocaleString(lang === "ko" ? "ko-KR" : "en-US");
 
@@ -110,7 +111,7 @@ function SimpleBars({ data, x, y, unit, allowDecimals = true }: { data: object[]
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barCategoryGap="25%">
         <CartesianGrid vertical={false} stroke="#e7e5e4" />
-        <XAxis dataKey={x} tick={AXIS} tickLine={false} axisLine={{ stroke: "#d6d3d1" }} />
+        <XAxis dataKey={x} tick={AXIS} tickLine={false} axisLine={{ stroke: "#d6d3d1" }} interval={0} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} allowDecimals={allowDecimals} />
         <Tooltip cursor={{ fill: "#f5f5f4" }} formatter={(v) => [`${Number(v).toLocaleString()} ${unit}`, ""]} separator="" />
         <Bar dataKey={y} fill={BAR} radius={[4, 4, 0, 0]} maxBarSize={32} />
