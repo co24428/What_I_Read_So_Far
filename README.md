@@ -56,3 +56,11 @@ Keys never go in git. `.env*` is git-ignored (except `.env.example`).
 
 - **Local:** `cp .env.example .env.local`, fill it in, then `npm install && npm run dev`.
 - **Vercel:** import the repo → Project → Settings → **Environment Variables** → add each one → redeploy.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Calendar](docs/screenshots/home.png) | ![Book detail](docs/screenshots/detail.png) |
+| ![Library](docs/screenshots/library.png) | ![Stats](docs/screenshots/stats.png) |
+| ![Book tree](docs/screenshots/tree.png) | ![Login](docs/screenshots/login.png) |
