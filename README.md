@@ -30,12 +30,18 @@ Everything is editable; "Enter manually" works without any API.
 ## Setup
 
 ### 1. Supabase
-1. Create a project at supabase.com.
-2. Dashboard → **SQL Editor** → paste and run [`supabase/schema.sql`](supabase/schema.sql).
-3. Dashboard → Project Settings → **API**: copy the Project URL and the `service_role` key.
 
-The service-role key is only used on the server; the browser never talks to Supabase directly,
-and row level security is on with no policies, so the public `anon` key can't read anything.
+The app keeps its tables in their own Postgres schema, `reading`, so it can share a Supabase
+project with another app (free plan = 2 projects) without touching that app's tables in `public`.
+
+1. Use an existing project, or create one at supabase.com.
+2. Dashboard → **SQL Editor** → paste and run [`supabase/schema.sql`](supabase/schema.sql).
+3. Dashboard → Project Settings → **API** (Data API) → **Exposed schemas** → add `reading` → Save.
+4. Copy the Project URL and the `service_role` (secret) key.
+
+The service-role key is only used on the server; the browser never talks to Supabase directly.
+Row level security is on with no policies, and the `anon` / `authenticated` roles have no access
+to the `reading` schema, so the public key can't read anything.
 
 ### 2. API keys
 - **Kakao**: developers.kakao.com → create app → App Keys → **REST API key**.
@@ -51,6 +57,7 @@ Keys never go in git. `.env*` is git-ignored (except `.env.example`).
 | `AUTH_SECRET` | random long string (`openssl rand -hex 32`) for signing the login cookie |
 | `SUPABASE_URL` | `https://xxxx.supabase.co` |
 | `SUPABASE_SERVICE_ROLE_KEY` | service_role key |
+| `SUPABASE_SCHEMA` | optional, defaults to `reading` |
 | `KAKAO_REST_API_KEY` | Kakao REST API key |
 | `NLK_API_KEY` | NLK cert key (optional — without it, page count/genre are entered by hand) |
 
